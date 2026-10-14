@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SYCUAN CASINO — Lucky Reels</title>
+<style>
+  :root{
+    --gold:#ffd24a;
+    --gold-deep:#c98a12;
+    --cyan:#4ff0ff;
+    --neon-blue:#3a7bff;
+    --neon-purple:#a24bff;
+    --neon-pink:#ff3ea5;
+    --panel:#140b22;
+    --cell:#0d0a1c;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;min-height:100%;}
+  body{
+    font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(255,180,60,.20), transparent 42%),
+      radial-gradient(circle at 88% 12%, rgba(255,120,40,.16), transparent 40%),
+      radial-gradient(circle at 78% 82%, rgba(160,60,255,.20), transparent 46%),
+      radial-gradient(circle at 20% 88%, rgba(40,120,255,.18), transparent 46%),
+      linear-gradient(160deg,#160a1e 0%,#0a0612 55%,#05030a 100%);
+    color:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:18px 12px 40px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  .bokeh{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+  .bokeh i{position:absolute;border-radius:50%;filter:blur(14px);opacity:.5;animation:float 9s ease-in-out infinite;}
+  .bokeh i:nth-child(1){width:120px;height:120px;background:rgba(255,190,70,.5);top:6%;left:6%;}
+  .bokeh i:nth-child(2){width:80px;height:80px;background:rgba(255,90,150,.45);top:22%;right:8%;animation-delay:1.4s;}
+  .bokeh i:nth-child(3){width:150px;height:150px;background:rgba(90,120,255,.4);bottom:8%;left:10%;animation-delay:2.6s;}
+  .bokeh i:nth-child(4){width:70px;height:70px;background:rgba(60,240,255,.4);bottom:20%;right:12%;animation-delay:3.4s;}
+  .bokeh i:nth-child(5){width:100px;height:100px;background:rgba(180,80,255,.4);top:48%;left:46%;animation-delay:4.2s;}
+  @keyframes float{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-22px) scale(1.08);}}
+
+  .cabinet{
+    position:relative;z-index:1;
+    width:100%;max-width:470px;
+    background:linear-gradient(180deg,#1c1030 0%,#120a22 40%,#0a0616 100%);
+    border-radius:26px;
+    padding:16px 16px 20px;
+    border:2px solid rgba(120,90,255,.45);
+    box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(120,60,255,.45),0 0 60px rgba(60,120,255,.25),0 24px 60px rgba(0,0,0,.7);
+    animation:cabGlow 5s linear infinite;
+  }
+  @keyframes cabGlow{
+    0%{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(60,120,255,.5),0 0 60px rgba(60,120,255,.25),0 24px 60px rgba(0,0,0,.7);}
+    33%{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(180,60,255,.5),0 0 60px rgba(180,60,255,.25),0 24px 60px rgba(0,0,0,.7);}
+    66%{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(255,60,160,.5),0 0 60px rgba(255,60,160,.25),0 24px 60px rgba(0,0,0,.7);}
+    100%{box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 0 26px rgba(60,120,255,.5),0 0 60px rgba(60,120,255,.25),0 24px 60px rgba(0,0,0,.7);}
+  }
+
+  .marquee{text-align:center;padding:8px 6px 12px;border-bottom:1px solid rgba(120,90,255,.25);margin-bottom:12px;}
+  .marquee h1{
+    margin:0;font-size:clamp(24px,7.4vw,34px);letter-spacing:2px;font-weight:900;
+    background:linear-gradient(180deg,#fff6c9 0%,var(--gold) 42%,var(--gold-deep) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+    text-shadow:0 0 18px rgba(255,200,60,.55);filter:drop-shadow(0 2px 0 rgba(120,70,0,.6));
+  }
+  .marquee .sub{margin-top:3px;font-size:11px;letter-spacing:5px;color:var(--cyan);text-shadow:0 0 10px rgba(80,240,255,.8);text-transform:uppercase;}
+  .mini-reel{display:flex;justify-content:center;gap:4px;margin-top:8px;}
+  .mini-reel span{width:22px;height:16px;border-radius:3px;background:#0a0716;border:1px solid rgba(90,140,255,.4);display:flex;align-items:center;justify-content:center;font-size:9px;box-shadow:0 0 6px rgba(60,120,255,.4) inset;}
+
+  .reels{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px;border-radius:16px;
+    background:linear-gradient(180deg,#0a0716,#07040f);
+    border:1px solid rgba(90,140,255,.35);
+    box-shadow:0 0 22px rgba(60,120,255,.28) inset,0 0 14px rgba(120,60,255,.25);
+    position:relative;
+  }
+  .reel{display:flex;flex-direction:column;gap:9px;}
+  .cell{
+    aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;
+    font-size:clamp(26px,9vw,40px);border-radius:12px;
+    background:radial-gradient(circle at 50% 35%,#1d1440 0%,#0c0a1c 78%);
+    border:1px solid rgba(90,120,255,.28);
+    box-shadow:0 0 10px rgba(60,120,255,.18) inset;
+    transition:transform .12s ease, box-shadow .2s ease, background .2s ease;
+    user-select:none;line-height:1;
+  }
+  .cell.spin{filter:blur(1.4px);opacity:.85;}
+  .cell.win{
+    background:radial-gradient(circle at 50% 35%,#5a3a00 0%,#2a1a00 80%);
+    border-color:var(--gold);
+    box-shadow:0 0 18px rgba(255,210,70,.9),0 0 30px rgba(255,160,40,.6) inset;
+    animation:winPulse .55s ease-in-out infinite alternate;transform:scale(1.05);
+  }
+  @keyframes winPulse{from{box-shadow:0 0 12px rgba(255,210,70,.7),0 0 20px rgba(255,160,40,.5) inset;}to{box-shadow:0 0 26px rgba(255,220,90,1),0 0 40px rgba(255,180,50,.8) inset;}}
+
+  .banner{
+    position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) scale(.6);
+    padding:10px 22px;border-radius:14px;font-weight:900;letter-spacing:1px;
+    font-size:clamp(18px,5.5vw,26px);white-space:nowrap;
+    background:linear-gradient(180deg,rgba(255,220,90,.97),rgba(220,140,20,.97));
+    color:#2a1500;border:2px solid #fff3c0;box-shadow:0 0 30px rgba(255,200,60,.9);
+    opacity:0;pointer-events:none;z-index:5;
+  }
+  .banner.show{animation:bannerPop 1.5s ease forwards;}
+  .banner.lose{background:linear-gradient(180deg,rgba(90,100,130,.95),rgba(40,45,70,.95));color:#dfe6ff;border-color:#8fa0d0;box-shadow:0 0 20px rgba(90,120,255,.5);}
+  @keyframes bannerPop{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.5);}
+    18%{opacity:1;transform:translate(-50%,-50%) scale(1.12);}
+    30%{transform:translate(-50%,-50%) scale(1);}
+    80%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+    100%{opacity:0;transform:translate(-50%,-58%) scale(.95);}
+  }
+
+  .hud{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+  .hud .box{background:linear-gradient(180deg,#0a0f1e,#060912);border:1px solid rgba(80,200,255,.35);border-radius:10px;padding:7px 6px;text-align:center;box-shadow:0 0 12px rgba(60,180,255,.22) inset;}
+  .hud .lbl{font-size:9px;letter-spacing:2px;color:#7fd8ff;text-transform:uppercase;opacity:.85;}
+  .hud .val{font-family:"Courier New",monospace;font-weight:700;font-size:clamp(15px,4.6vw,20px);color:var(--cyan);text-shadow:0 0 10px rgba(80,240,255,.9);margin-top:2px;font-variant-numeric:tabular-nums;}
+  .hud .val.win{color:var(--gold);text-shadow:0 0 12px rgba(255,210,70,.95);}
+
+  .controls{margin-top:14px;display:flex;flex-direction:column;gap:10px;}
+  .row{display:flex;gap:8px;}
+  .btn{
+    flex:1;cursor:pointer;border:none;border-radius:12px;padding:11px 6px;font-weight:800;font-size:13px;letter-spacing:.5px;
+    color:#eaf2ff;background:linear-gradient(180deg,#2a2350,#171233);border:1px solid rgba(120,110,255,.4);
+    box-shadow:0 3px 0 rgba(0,0,0,.5),0 0 12px rgba(90,80,255,.25);
+    transition:transform .08s ease,filter .15s ease;user-select:none;
+  }
+  .btn:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.5);}
+  .btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.5);}
+  .btn small{display:block;font-size:9px;opacity:.7;font-weight:600;letter-spacing:1px;margin-top:1px;}
+  .btn.on{background:linear-gradient(180deg,#1f6b3a,#0f3d21);border-color:#4be08a;box-shadow:0 0 14px rgba(70,220,140,.5);}
+
+  .spin-wrap{display:flex;gap:10px;align-items:stretch;}
+  .spin{
+    flex:2;cursor:pointer;border:none;border-radius:16px;padding:16px 10px;font-weight:900;font-size:clamp(18px,5.6vw,24px);letter-spacing:2px;
+    color:#2a0d00;background:linear-gradient(180deg,#ffe27a 0%,#ffb020 45%,#e07a00 100%);
+    border:2px solid #fff0b8;box-shadow:0 5px 0 #8a4a00,0 0 26px rgba(255,180,40,.7);
+    text-shadow:0 1px 0 rgba(255,255,255,.5);transition:transform .08s ease,filter .15s ease;user-select:none;
+  }
+  .spin:active{transform:translateY(3px);box-shadow:0 2px 0 #8a4a00,0 0 20px rgba(255,180,40,.7);}
+  .spin:disabled{filter:grayscale(.55) brightness(.8);cursor:not-allowed;transform:none;}
+  .spin.spinning{animation:spinShake .35s linear infinite;}
+  @keyframes spinShake{0%,100%{transform:translateY(0);}50%{transform:translateY(2px);}}
+
+  .icon-btn{flex:1;cursor:pointer;border-radius:16px;border:1px solid rgba(120,110,255,.4);background:linear-gradient(180deg,#241d47,#130f2b);color:#dfe8ff;font-size:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 0 rgba(0,0,0,.5);transition:transform .08s ease;}
+  .icon-btn:active{transform:translateY(2px);}
+  .icon-btn.on{border-color:#4be08a;box-shadow:0 0 14px rgba(70,220,140,.5);}
+
+  .paytable{margin-top:14px;background:linear-gradient(180deg,#0a0716,#07040f);border:1px solid rgba(90,140,255,.28);border-radius:14px;padding:10px 12px;}
+  .paytable h3{margin:0 0 8px;font-size:11px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;text-align:center;opacity:.9;}
+  .pay-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px 14px;}
+  .pay-item{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#c9d4ff;}
+  .pay-item .s{font-size:16px;}
+  .pay-item .p{font-family:"Courier New",monospace;color:var(--gold);font-weight:700;}
+
+  .note{margin-top:12px;text-align:center;font-size:10px;letter-spacing:1px;color:#8a7fb0;text-transform:uppercase;}
+
+  .overlay{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(4,2,10,.86);backdrop-filter:blur(4px);}
+  .overlay.show{display:flex;}
+  .overlay .card{max-width:340px;width:100%;text-align:center;background:linear-gradient(180deg,#1c1030,#0c0718);border:2px solid rgba(255,200,60,.5);border-radius:20px;padding:26px 20px;box-shadow:0 0 40px rgba(255,180,40,.4);}
+  .overlay h2{margin:0 0 8px;font-size:26px;color:var(--gold);letter-spacing:1px;text-shadow:0 0 16px rgba(255,200,60,.7);}
+  .overlay p{margin:0 0 18px;color:#c9d4ff;font-size:14px;line-height:1.5;}
+  .overlay .big{font-family:"Courier New",monospace;font-size:30px;color:var(--cyan);text-shadow:0 0 14px rgba(80,240,255,.9);display:block;margin:6px 0 14px;}
+  .overlay .btn{width:100%;padding:14px;font-size:16px;background:linear-gradient(180deg,#ffe27a,#ffb020);color:#2a0d00;border:2px solid #fff0b8;box-shadow:0 4px 0 #8a4a00;}
+</style>
+</head>
+<body>
+<div class="bokeh"><i></i><i></i><i></i><i></i><i></i></div>
+
+<div class="cabinet">
+  <div class="marquee">
+    <h1>SYCUAN CASINO</h1>
+    <div class="sub">Lucky Reels</div>
+    <div class="mini-reel" id="miniReel"></div>
+  </div>
+
+  <div class="reels" id="reels">
+    <div class="banner" id="banner"></div>
+  </div>
+
+  <div class="hud">
+    <div class="box"><div class="lbl">Credits</div><div class="val" id="hudCredits">1000</div></div>
+    <div class="box"><div class="lbl">Bet</div><div class="val" id="hudBet">25</div></div>
+    <div class="box"><div class="lbl">Win</div><div class="val win" id="hudWin">0</div></div>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <button class="btn" id="betDown">BET −<small id="betLbl">5 / line</small></button>
+      <button class="btn" id="betUp">BET +<small>&nbsp;</small></button>
+      <button class="btn" id="linesBtn">LINES<small id="linesLbl">5</small></button>
+    </div>
+    <div class="spin-wrap">
+      <button class="spin" id="spinBtn">SPIN</button>
+      <button class="icon-btn" id="autoBtn" title="Auto-spin">⟳</button>
+      <button class="icon-btn" id="soundBtn" title="Sound">🔊</button>
+    </div>
+    <div class="row">
+      <button class="btn" id="maxBtn">MAX BET<small id="maxLbl">100 / line</small></button>
+      <button class="btn" id="restartBtn">RESTART<small>reset 1000</small></button>
+    </div>
+  </div>
+
+  <div class="paytable">
+    <h3>Paytable — 3 in a row</h3>
+    <div class="pay-grid" id="payGrid"></div>
+  </div>
+
+  <div class="note">For entertainment only · No real money</div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h2 id="ovTitle">OUT OF CREDITS</h2>
+    <p id="ovText">You ran out of credits. The house always wins… but you can try again.</p>
+    <span class="big" id="ovStat">0</span>
+    <button class="btn" id="ovRestart">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var SYMBOLS = [
+    {id:'cherry',  emoji:'🍒', weight:22, pay:3,  name:'Cherry'},
+    {id:'lemon',   emoji:'🍋', weight:20, pay:4,  name:'Lemon'},
+    {id:'orange',  emoji:'🍊', weight:18, pay:5,  name:'Orange'},
+    {id:'bell',    emoji:'🔔', weight:14, pay:8,  name:'Bell'},
+    {id:'star',    emoji:'⭐', weight:10, pay:12, name:'Star'},
+    {id:'seven',   emoji:'7️⃣', weight:6,  pay:25, name:'Lucky 7'},
+    {id:'diamond', emoji:'💎', weight:3,  pay:50, name:'Diamond'}
+  ];
+  var TOTAL_WEIGHT = SYMBOLS.reduce(function(s,x){return s+x.weight;},0);
+
+  function pickSymbol(){
+    var r = Math.random()*TOTAL_WEIGHT;
+    for(var i=0;i<SYMBOLS.length;i++){ r -= SYMBOLS[i].weight; if(r<=0) return SYMBOLS[i]; }
+    return SYMBOLS[0];
+  }
+
+  var PAYLINES = [
+    {name:'Middle',      rows:[1,1,1]},
+    {name:'Top',         rows:[0,0,0]},
+    {name:'Bottom',      rows:[2,2,2]},
+    {name:'Diagonal ↘',  rows:[0,1,2]},
+    {name:'Diagonal ↗',  rows:[2,1,0]}
+  ];
+
+  var BET_STEPS = [1,2,5,10,25,50,100];
+
+  var state = {
+    credits: 1000, betPerLine: 5, lines: 5, lastWin: 0,
+    spinning: false, auto: false, sound: true, gameOver: false,
+    spins: 0, biggestWin: 0
+  };
+
+  var grid = [[null,null,null],[null,null,null],[null,null,null]];
+
+  var reelsEl   = document.getElementById('reels');
+  var bannerEl  = document.getElementById('banner');
+  var hudCredits= document.getElementById('hudCredits');
+  var hudBet    = document.getElementById('hudBet');
+  var hudWin    = document.getElementById('hudWin');
+  var betLbl    = document.getElementById('betLbl');
+  var linesLbl  = document.getElementById('linesLbl');
+  var maxLbl    = document.getElementById('maxLbl');
+  var spinBtn   = document.getElementById('spinBtn');
+  var autoBtn   = document.getElementById('autoBtn');
+  var soundBtn  = document.getElementById('soundBtn');
+  var overlay   = document.getElementById('overlay');
+  var ovTitle   = document.getElementById('ovTitle');
+  var ovText    = document.getElementById('ovText');
+  var ovStat    = document.getElementById('ovStat');
+
+  var cellEls = [[],[],[]];
+  for(var r=0;r<3;r++){
+    var reel = document.createElement('div');
+    reel.className = 'reel';
+    for(var row=0;row<3;row++){
+      var c = document.createElement('div');
+      c.className = 'cell';
+      c.dataset.r = r; c.dataset.row = row;
+      reel.appendChild(c);
+      cellEls[r][row] = c;
+    }
+    reelsEl.appendChild(reel);
+  }
+
+  var miniReel = document.getElementById('miniReel');
+  for(var m=0;m<5;m++){
+    var s = document.createElement('span');
+    s.textContent = SYMBOLS[m % SYMBOLS.length].emoji;
+    miniReel.appendChild(s);
+  }
+
+  var payGrid = document.getElementById('payGrid');
+  SYMBOLS.slice().sort(function(a,b){return b.pay-a.pay;}).forEach(function(sym){
+    var d = document.createElement('div');
+    d.className = 'pay-item';
+    d.innerHTML = '<span class="s">'+sym.emoji+'</span><span>'+sym.name+'</span><span class="p">'+sym.pay+'×</span>';
+    payGrid.appendChild(d);
+  });
+
+  var actx = null;
+  function audioCtx(){
+    if(!actx){ try{ actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ actx=null; } }
+    return actx;
+  }
+  function beep(freq, dur, type, vol){
+    if(!state.sound) return;
+    var ctx = audioCtx(); if(!ctx) return;
+    try{
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type||'square'; o.frequency.value = freq; g.gain.value = vol||0.05;
+      o.connect(g); g.connect(ctx.destination); o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+      o.stop(ctx.currentTime + dur);
+    }catch(e){}
+  }
+  function tickSound(){ beep(320 + Math.random()*120, 0.03, 'square', 0.02); }
+  function winSound(){ [523,659,784,1047].forEach(function(f,i){ setTimeout(function(){ beep(f,0.16,'triangle',0.07); }, i*90); }); }
+  function loseSound(){ beep(180,0.18,'sawtooth',0.04); }
+
+  function setCell(r,row,sym){
+    var el = cellEls[r][row];
+    el.textContent = sym.emoji;
+    el.dataset.sym = sym.id;
+  }
+  function clearHighlights(){
+    for(var r=0;r<3;r++) for(var row=0;row<3;row++) cellEls[r][row].classList.remove('win');
+  }
+  function updateHUD(){
+    hudCredits.textContent = state.credits;
+    hudBet.textContent = state.betPerLine * state.lines;
+    hudWin.textContent = state.lastWin;
+    betLbl.textContent = state.betPerLine + ' / line';
+    linesLbl.textContent = state.lines;
+    maxLbl.textContent = BET_STEPS[BET_STEPS.length-1] + ' / line';
+  }
+  function updateButtons(){
+    var totalBet = state.betPerLine * state.lines;
+    spinBtn.disabled = state.spinning || state.gameOver || state.credits < totalBet;
+    spinBtn.classList.toggle('spinning', state.spinning);
+    spinBtn.textContent = state.spinning ? 'SPINNING…' : 'SPIN';
+    document.getElementById('betDown').disabled = state.spinning || state.betPerLine <= BET_STEPS[0];
+    document.getElementById('betUp').disabled   = state.spinning || state.betPerLine >= BET_STEPS[BET_STEPS.length-1];
+    document.getElementById('linesBtn').disabled= state.spinning;
+    document.getElementById('maxBtn').disabled  = state.spinning;
+    autoBtn.classList.toggle('on', state.auto);
+    soundBtn.classList.toggle('on', state.sound);
+    soundBtn.textContent = state.sound ? '🔊' : '🔇';
+  }
+  function showBanner(text, isLose){
+    bannerEl.textContent = text;
+    bannerEl.classList.remove('show','lose');
+    if(isLose) bannerEl.classList.add('lose');
+    void bannerEl.offsetWidth;
+    bannerEl.classList.add('show');
+  }
+
+  function generateGrid(){
+    var g = [[],[],[]];
+    for(var r=0;r<3;r++) for(var row=0;row<3;row++) g[r][row] = pickSymbol();
+    return g;
+  }
+
+  function evaluate(g, betPerLine, lines){
+    var totalWin = 0, winCells = {}, lineWins = [];
+    var active = PAYLINES.slice(0, lines);
+    active.forEach(function(line){
+      var a = g[0][line.rows[0]], b = g[1][line.rows[1]], c = g[2][line.rows[2]];
+      if(a.id===b.id && b.id===c.id){
+        var pay = a.pay * betPerLine;
+        totalWin += pay;
+        lineWins.push({line:line.name, sym:a.id, pay:pay});
+        winCells['0-'+line.rows[0]] = 1;
+        winCells['1-'+line.rows[1]] = 1;
+        winCells['2-'+line.rows[2]] = 1;
+      }
+    });
+    var diamonds = 0, dCells = [];
+    for(var r=0;r<3;r++) for(var row=0;row<3;row++){
+      if(g[r][row].id==='diamond'){ diamonds++; dCells.push(r+'-'+row); }
+    }
+    var scatterWin = 0;
+    if(diamonds>=3){
+      scatterWin = betPerLine * 15 * (diamonds-2);
+      totalWin += scatterWin;
+      dCells.forEach(function(k){ winCells[k]=1; });
+    }
+    return {totalWin:totalWin, winCells:winCells, lineWins:lineWins, scatterWin:scatterWin, diamonds:diamonds};
+  }
+
+  function spin(){
+    if(state.spinning || state.gameOver) return;
+    var totalBet = state.betPerLine * state.lines;
+    if(state.credits < totalBet){
+      if(state.credits < 1){ triggerGameOver(); }
+      else { showBanner('LOWER YOUR BET', true); }
+      return;
+    }
+    state.credits -= totalBet;
+    state.lastWin = 0;
+    state.spinning = true;
+    state.spins++;
+    clearHighlights();
+    updateHUD();
+    updateButtons();
+
+    var finalGrid = generateGrid();
+    var stopTimes = [620, 900, 1180];
+
+    for(var r=0;r<3;r++){
+      (function(reelIdx){
+        var iv = setInterval(function(){
+          for(var row=0;row<3;row++){
+            var el = cellEls[reelIdx][row];
+            el.textContent = pickSymbol().emoji;
+            el.classList.add('spin');
+          }
+          tickSound();
+        }, 55);
+        setTimeout(function(){
+          clearInterval(iv);
+          for(var row=0;row<3;row++){
+            setCell(reelIdx,row,finalGrid[reelIdx][row]);
+            cellEls[reelIdx][row].classList.remove('spin');
+          }
+          if(reelIdx===2) finishSpin(finalGrid);
+        }, stopTimes[reelIdx]);
+      })(r);
+    }
+  }
+
+  function finishSpin(finalGrid){
+    grid = finalGrid;
+    var res = evaluate(grid, state.betPerLine, state.lines);
+    state.lastWin = res.totalWin;
+
+    if(res.totalWin > 0){
+      state.credits += res.totalWin;
+      if(res.totalWin > state.biggestWin) state.biggestWin = res.totalWin;
+      Object.keys(res.winCells).forEach(function(k){
+        var p = k.split('-');
+        cellEls[+p[0]][+p[1]].classList.add('win');
+      });
+      var label = 'WIN +' + res.totalWin;
+      if(res.scatterWin>0 && res.lineWins.length===0) label = '💎 SCATTER +' + res.totalWin;
+      showBanner(label, false);
+      winSound();
+    } else {
+      showBanner('NO WIN', true);
+      loseSound();
+    }
+
+    state.spinning = false;
+    updateHUD();
+    updateButtons();
+
+    if(state.credits < 1){ setTimeout(triggerGameOver, 900); return; }
+    if(state.auto){ setTimeout(function(){ if(state.auto && !state.gameOver) spin(); }, 950); }
+  }
+
+  function triggerGameOver(){
+    state.gameOver = true;
+    state.auto = false;
+    ovTitle.textContent = 'OUT OF CREDITS';
+    ovText.textContent = 'You ran out of credits. The house always wins… but you can try again.';
+    ovStat.textContent = 'Spins: ' + state.spins + ' · Best win: ' + state.biggestWin;
+    overlay.classList.add('show');
+    updateButtons();
+  }
+
+  function restart(){
+    state.credits = 1000; state.betPerLine = 5; state.lines = 5; state.lastWin = 0;
+    state.spinning = false; state.auto = false; state.gameOver = false;
+    state.spins = 0; state.biggestWin = 0;
+    overlay.classList.remove('show');
+    clearHighlights();
+    for(var r=0;r<3;r++) for(var row=0;row<3;row++) setCell(r,row,pickSymbol());
+    updateHUD();
+    updateButtons();
+    showBanner('GOOD LUCK', false);
+  }
+
+  spinBtn.addEventListener('click', function(){ audioCtx(); spin(); });
+  document.getElementById('betDown').addEventListener('click', function(){
+    var i = BET_STEPS.indexOf(state.betPerLine);
+    if(i>0){ state.betPerLine = BET_STEPS[i-1]; updateHUD(); updateButtons(); }
+  });
+  document.getElementById('betUp').addEventListener('click', function(){
+    var i = BET_STEPS.indexOf(state.betPerLine);
+    if(i<BET_STEPS.length-1){ state.betPerLine = BET_STEPS[i+1]; updateHUD(); updateButtons(); }
+  });
+  document.getElementById('linesBtn').addEventListener('click', function(){
+    state.lines = state.lines >= 5 ? 1 : state.lines + 1;
+    updateHUD(); updateButtons();
+  });
+  document.getElementById('maxBtn').addEventListener('click', function(){
+    state.betPerLine = BET_STEPS[BET_STEPS.length-1]; state.lines = 5;
+    updateHUD(); updateButtons();
+  });
+  document.getElementById('restartBtn').addEventListener('click', restart);
+  document.getElementById('ovRestart').addEventListener('click', restart);
+  autoBtn.addEventListener('click', function(){
+    if(state.gameOver) return;
+    state.auto = !state.auto;
+    updateButtons();
+    if(state.auto && !state.spinning) spin();
+  });
+  soundBtn.addEventListener('click', function(){
+    state.sound = !state.sound;
+    if(state.sound){ audioCtx(); beep(660,0.1,'triangle',0.06); }
+    updateButtons();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.code==='Space' || e.key===' '){ e.preventDefault(); if(!spinBtn.disabled) spin(); }
+    if(e.key==='r' || e.key==='R'){ restart(); }
+  });
+
+  for(var r2=0;r2<3;r2++) for(var row2=0;row2<3;row2++) setCell(r2,row2,pickSymbol());
+  updateHUD();
+  updateButtons();
+
+  window.SYCUAN = {
+    state: state, spin: spin, restart: restart, evaluate: evaluate,
+    generateGrid: generateGrid, pickSymbol: pickSymbol,
+    SYMBOLS: SYMBOLS, PAYLINES: PAYLINES,
+    getGrid: function(){ return grid; },
+    isSpinning: function(){ return state.spinning; }
+  };
+})();
+</script>
+</body>
+</html>
